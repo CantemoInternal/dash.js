@@ -7054,7 +7054,7 @@ MediaPlayer.dependencies.AbrController.BANDWIDTH_SAFETY = .9;
 
 MediaPlayer.dependencies.BufferController = function() {
     "use strict";
-    var STALL_THRESHOLD = .5, requiredQuality = 0, currentQuality = -1, bufferLevel = 0, bufferTarget = 0, criticalBufferLevel = Number.POSITIVE_INFINITY, mediaSource, maxAppendedIndex = -1, lastIndex = -1, type, buffer = null, minBufferTime, hasSufficientBuffer = null, appendedBytesInfo, wallclockTicked = 0, bufferCompletedSent = false, isAppendingInProgress = false, isPruningInProgress = false, inbandEventFound = false, createBuffer = function(mediaInfo) {
+    var MINIMUM_BUFFER_TO_PRUNE = 20, STALL_THRESHOLD = .5, requiredQuality = 0, currentQuality = -1, bufferLevel = 0, bufferTarget = 0, criticalBufferLevel = Number.POSITIVE_INFINITY, mediaSource, maxAppendedIndex = -1, lastIndex = -1, type, buffer = null, minBufferTime, hasSufficientBuffer = null, appendedBytesInfo, wallclockTicked = 0, bufferCompletedSent = false, isAppendingInProgress = false, isPruningInProgress = false, inbandEventFound = false, createBuffer = function(mediaInfo) {
         if (!mediaInfo || !mediaSource || !this.streamProcessor) return null;
         var sourceBuffer = null;
         try {
@@ -7211,7 +7211,7 @@ MediaPlayer.dependencies.BufferController = function() {
         return totalBufferedTime < criticalBufferLevel;
     }, pruneBuffer = function() {
         var start = buffer.buffered.length ? buffer.buffered.start(0) : 0, currentTime = this.playbackController.getTime(), bufferToPrune = currentTime - start - MediaPlayer.dependencies.BufferController.BUFFER_TO_KEEP;
-        if (!isPruningInProgress && mediaSource.readyState !== "ended") {
+        if (!isPruningInProgress && mediaSource.readyState !== "ended" && bufferToPrune > MINIMUM_BUFFER_TO_PRUNE) {
             isPruningInProgress = true;
             this.sourceBufferExt.remove(buffer, 0, Math.round(start + bufferToPrune), mediaSource);
         }
