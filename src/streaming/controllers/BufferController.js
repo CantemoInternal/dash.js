@@ -30,7 +30,8 @@
  */
 MediaPlayer.dependencies.BufferController = function () {
     "use strict";
-    var STALL_THRESHOLD = 0.5,
+    var MINIMUM_BUFFER_TO_PRUNE = 20,
+        STALL_THRESHOLD = 0.5,
         requiredQuality = 0,
         currentQuality = -1,
         bufferLevel = 0,
@@ -319,7 +320,7 @@ MediaPlayer.dependencies.BufferController = function () {
             // we want to get rid off buffer that is more than x
             // seconds behind current time, but no pruning once it's
             // finished.
-            if (!isPruningInProgress && mediaSource.readyState !== "ended") {
+            if (!isPruningInProgress && mediaSource.readyState !== "ended" && bufferToPrune > MINIMUM_BUFFER_TO_PRUNE) {
                 isPruningInProgress = true;
                 this.sourceBufferExt.remove(buffer, 0, Math.round(start + bufferToPrune), mediaSource);
             }
